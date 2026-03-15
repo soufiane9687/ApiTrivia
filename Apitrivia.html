@@ -34,7 +34,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── ANIMATED HONEYCOMB BG ── */
+/* ── Animacion honey ── */
 body::before {
   content: '';
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -902,7 +902,7 @@ body::after {
     </div>
   </div>
 
-  <!-- RULES -->
+  <!-- RULES TEXT -->
   <div class="card rules-card">
     <div class="rules-title">📜 Reglas del Juego</div>
 
@@ -1181,7 +1181,7 @@ function advanceOneStep() {
   const btn = document.getElementById('advanceBtn');
   btn.disabled = true;
   
-  // Initialize audio context on user interaction (iOS fix)
+  // Initialize audio context on user interaction (iOS)
   if (AC.state === 'suspended') {
     AC.resume();
   }
