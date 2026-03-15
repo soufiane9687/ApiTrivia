@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)file:///C:/Users/7962864/Downloads/index_3.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>🐝 ApiTrivia — El Juego de la Apicultura</title>
+<link href="./Apitrivia_files/css2" rel="stylesheet">
+<style>
+:root {
+  --h1: #F59E0B; --h2: #D97706; --h3: #B45309;
+  --amber: #FCD34D; --gold: #EAB308;
+  --cream: #FFFBEB; --light: #FEF3C7; --pale: #FEF9C3;
+  --brown: #78350F; --mid: #92400E; --dark: #451A03;
+  --green: #059669; --green-l: #ECFDF5; --green-m: #D1FAE5;
+  --red: #DC2626; --red-l: #FEF2F2; --red-m: #FEE2E2;
+  --white: #FFFFFF;
+  --card-bg: rgba(255,255,255,0.85);
+  --card-border: rgba(252,211,77,0.6);
+  --shadow-sm: 0 2px 8px rgba(120,53,15,0.12);
+  --shadow-md: 0 6px 24px rgba(120,53,15,0.18);
+  --shadow-lg: 0 12px 40px rgba(120,53,15,0.25);
+  --shadow-xl: 0 20px 60px rgba(120,53,15,0.35);
+  --radius-sm: 12px; --radius-md: 18px; --radius-lg: 24px; --radius-xl: 32px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #FEF9C3 0%, #FEF3C7 30%, #FDE68A 65%, #FCD34D 100%);
+  overflow-x: hidden;
+}
+
+/* ── ANIMATED HONEYCOMB BG ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(ellipse at 15% 10%, rgba(245,158,11,0.2) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 15%, rgba(234,179,8,0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 90%, rgba(180,83,9,0.12) 0%, transparent 50%);
+  animation: bgShimmer 8s ease-in-out infinite alternate;
+}
+
+@keyframes bgShimmer {
+  from { opacity: 0.7; }
+  to   { opacity: 1; }
+}
+
+/* floating honeycomb decoration */
+body::after {
+  content: '⬡';
+  position: fixed;
+  font-size: 600px;
+  color: rgba(245,158,11,0.04);
+  right: -150px; top: -100px;
+  z-index: 0; pointer-events: none;
+  animation: hexSpin 30s linear infinite;
+}
+@keyframes hexSpin { to { transform: rotate(360deg); } }
+
+.page {
+  position: relative; z-index: 1;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+  padding-bottom: max(60px, env(safe-area-inset-bottom));
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+  animation: slideDown 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.header-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--h2), var(--h3));
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 16px;
+  border-radius: 99px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 3.4rem;
+  font-weight: 900;
+  color: var(--brown);
+  line-height: 0.95;
+  letter-spacing: -1px;
+  text-shadow: 3px 3px 0 rgba(255,255,255,0.5), 0 6px 20px rgba(120,53,15,0.2);
+  margin-bottom: 8px;
+}
+
+.title .bee { display:inline-block; animation: beeDance 2.5s ease-in-out infinite; }
+.title .bee2 { animation-delay: 0.4s; animation-direction: alternate; }
+
+@keyframes beeDance {
+  0%,100% { transform: translateY(0) rotate(-5deg); }
+  50%      { transform: translateY(-8px) rotate(5deg); }
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--mid);
+  letter-spacing: 0.5px;
+}
+
+/* ── CARD BASE ── */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.3s;
+}
+
+.card:hover { box-shadow: var(--shadow-lg); }
+
+/* ── SCOREBOARD ── */
+.scoreboard {
+  padding: 16px;
+  margin-bottom: 14px;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stats-grid + .stats-grid { margin-top: 10px; }
+
+.stat {
+  background: linear-gradient(145deg, var(--white), var(--light));
+  border-radius: var(--radius-md);
+  padding: 12px 8px;
+  text-align: center;
+  border: 2px solid rgba(252,211,77,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+.stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+.stat-icon { font-size: 1.4rem; display: block; margin-bottom: 3px; }
+.stat-val {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--brown);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.stat-lbl {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: var(--mid);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.stat-combo {
+  background: linear-gradient(145deg, #FFF1F2, #FEE2E2);
+  border-color: rgba(252,165,165,0.5);
+}
+
+/* ── PROGRESS ── */
+.progress-card {
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.progress-label { font-size: 0.75rem; font-weight: 900; color: var(--mid); }
+.progress-pct {
+  font-family: 'Baloo 2', cursive;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--h2);
+}
+.progress-track {
+  background: rgba(252,211,77,0.3);
+  border-radius: 99px;
+  height: 16px;
+  overflow: visible;
+  position: relative;
+  border: 2px solid rgba(252,211,77,0.4);
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--h1) 0%, var(--gold) 50%, var(--h1) 100%);
+  background-size: 200% 100%;
+  border-radius: 99px;
+  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+  animation: shimmerBar 2s linear infinite;
+}
+@keyframes shimmerBar {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+.progress-bee {
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+  animation: beeWobble 1s ease-in-out infinite;
+}
+@keyframes beeWobble {
+  0%,100% { transform: translateY(-50%) rotate(-8deg); }
+  50%      { transform: translateY(-60%) rotate(8deg); }
+}
+
+/* ── BOARD ── */
+.board-card {
+  padding: 16px;
+  margin-bottom: 14px;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+}
+
+.board-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.board-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--brown);
+  letter-spacing: 0.3px;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+.tile {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  position: relative;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+  overflow: hidden;
+}
+
+.tile::before {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.5), transparent);
+  transition: opacity 0.3s;
+}
+.tile:hover::before { opacity: 1; }
+
+.tile-number {
+  position: absolute;
+  top: 3px; left: 4px;
+  background: rgba(120,53,15,0.7);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 900;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+  line-height: 1;
+  z-index: 2;
+}
+
+.tile-start  { background: linear-gradient(135deg, #ECFDF5, #D1FAE5); border-color: rgba(16,185,129,0.4); }
+.tile-finish { background: linear-gradient(135deg, #D1FAE5, #6EE7B7); border-color: rgba(5,150,105,0.5); box-shadow: 0 0 10px rgba(5,150,105,0.2); }
+.tile-question { background: linear-gradient(135deg, #FFFBEB, #FEF9C3); border-color: rgba(252,211,77,0.3); }
+.tile-bonus {
+  background: linear-gradient(135deg, #FEF9C3, #FDE68A);
+  border-color: rgba(234,179,8,0.5);
+  box-shadow: 0 2px 8px rgba(234,179,8,0.2);
+}
+.tile-multiplier {
+  background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+  border-color: rgba(59,130,246,0.5);
+  box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+  animation: multiplierPulse 2s ease-in-out infinite;
+}
+@keyframes multiplierPulse {
+  0%,100% { box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+  50%      { box-shadow: 0 4px 16px rgba(59,130,246,0.6); }
+}
+
+.tile-active {
+  transform: scale(1.15) !important;
+  z-index: 10;
+  animation: tileGlow 1.2s ease-in-out infinite !important;
+}
+@keyframes tileGlow {
+  0%,100% { box-shadow: 0 0 0 3px var(--h1), 0 0 20px rgba(245,158,11,0.5); border-color: var(--h1); }
+  50%      { box-shadow: 0 0 0 5px var(--h1), 0 0 35px rgba(245,158,11,0.8); border-color: var(--gold); }
+}
+
+.bee-player {
+  position: absolute;
+  font-size: 2rem;
+  z-index: 20;
+  pointer-events: none;
+  animation: beeHover 1.6s ease-in-out infinite;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3));
+}
+@keyframes beeHover {
+  0%,100% { transform: translateY(0) scale(1) rotate(-6deg); }
+  50%      { transform: translateY(-7px) scale(1.05) rotate(6deg); }
+}
+
+/* ── DICE SECTION ── */
+.dice-card {
+  padding: 22px 18px;
+  margin-bottom: 14px;
+  text-align: center;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.25s both;
+}
+
+.dice-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.dice {
+  width: 90px; height: 90px;
+  background: linear-gradient(145deg, #FFFFFF, #FEF3C7);
+  border: 3px solid var(--h1);
+  border-radius: 20px;
+  display: flex;
+  align-items: center; justify-content: center;
+  font-family: 'Baloo 2', cursive;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--brown);
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 6px 0 var(--h2), 0 8px 20px rgba(120,53,15,0.2);
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.dice::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 60%);
+  border-radius: 18px;
+  pointer-events: none;
+}
+.dice:hover:not(.rolling) {
+  transform: translateY(-5px);
+  box-shadow: 0 11px 0 var(--h2), 0 14px 30px rgba(120,53,15,0.25);
+}
+.dice:active:not(.rolling) {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 var(--h2), 0 4px 10px rgba(120,53,15,0.15);
+}
+.dice.rolling { animation: diceRoll 0.12s linear infinite; }
+@keyframes diceRoll {
+  0%   { transform: rotate(0deg)   scale(0.92); }
+  25%  { transform: rotate(90deg)  scale(1.08); }
+  50%  { transform: rotate(180deg) scale(0.92); }
+  75%  { transform: rotate(270deg) scale(1.08); }
+  100% { transform: rotate(360deg) scale(0.92); }
+}
+
+.roll-btn {
+  background: linear-gradient(145deg, var(--h1), var(--h2));
+  color: white;
+  border: none;
+  padding: 15px 50px;
+  border-radius: 50px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--h3), 0 8px 20px rgba(120,53,15,0.2);
+  transition: transform 0.15s, box-shadow 0.15s;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.roll-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+  border-radius: 50px;
+}
+.roll-btn:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 9px 0 var(--h3), 0 12px 28px rgba(120,53,15,0.25);
+}
+.roll-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--h3), 0 4px 10px rgba(120,53,15,0.15);
+}
+.roll-btn:disabled {
+  background: linear-gradient(145deg, #D1D5DB, #9CA3AF);
+  box-shadow: 0 4px 0 #6B7280;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* ── RULES ── */
+.rules-card {
+  padding: 20px;
+  margin-top: 14px;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+}
+
+.rules-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--brown);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--white), var(--light));
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border: 2px solid rgba(252,211,77,0.35);
+  font-size: 0.88rem;
+  color: var(--brown);
+  font-weight: 700;
+  line-height: 1.45;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.rule-item:hover { transform: translateX(5px); box-shadow: var(--shadow-sm); }
+.rule-item:last-of-type { margin-bottom: 0; }
+.rule-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+
+.legend-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--brown);
+  margin: 18px 0 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--white), var(--light));
+  border-radius: 10px;
+  padding: 9px 12px;
+  border: 2px solid rgba(252,211,77,0.35);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--brown);
+  transition: transform 0.15s;
+}
+.legend-item:hover { transform: scale(1.03); }
+.legend-dot {
+  width: 20px; height: 20px; border-radius: 6px;
+  flex-shrink: 0; border: 2px solid rgba(0,0,0,0.08);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.6);
+}
+
+/* ── COMBO TOAST ── */
+.combo-toast {
+  position: fixed;
+  top: 20px; left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: linear-gradient(135deg, var(--h1), var(--gold));
+  color: white;
+  padding: 10px 28px;
+  border-radius: 50px;
+  border: 3px solid rgba(255,255,255,0.5);
+  box-shadow: 0 8px 30px rgba(245,158,11,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+  z-index: 999;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.45s cubic-bezier(0.34,1.56,0.64,1);
+  backdrop-filter: blur(8px);
+}
+.combo-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  animation: toastPulse 2s ease-in-out 0.5s infinite;
+}
+@keyframes toastPulse {
+  0%,100% { transform: translateX(-50%) translateY(0) scale(1); }
+  50%      { transform: translateX(-50%) translateY(-5px) scale(1.03); }
+}
+.combo-toast-label { font-weight: 900; font-size: 0.85rem; opacity: 0.9; letter-spacing: 0.5px; }
+.combo-toast-num { font-family: 'Baloo 2', cursive; font-size: 1.8rem; font-weight: 900; line-height: 1; }
+.combo-toast-bonus { font-size: 0.75rem; font-weight: 700; opacity: 0.85; }
+
+/* ── NOTIFICATION ── */
+.notif {
+  position: fixed;
+  bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: rgba(30,10,0,0.85);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  z-index: 9999;
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  opacity: 0;
+  border: 1px solid rgba(255,255,255,0.15);
+  white-space: nowrap;
+}
+.notif.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ── MODALS ── */
+.modal {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(30,10,0,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+  align-items: center;
+  justify-content: center;
+}
+.modal.show { display: flex; animation: modalFadeIn 0.3s ease; }
+@keyframes modalFadeIn { from { opacity:0; } to { opacity:1; } }
+
+.modal-box {
+  background: linear-gradient(160deg, #FFFBEB, #FEF3C7);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  max-width: 480px; width: 100%;
+  border: 3px solid var(--amber);
+  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255,255,255,0.4);
+  animation: modalPop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+@keyframes modalPop {
+  from { transform: scale(0.8) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* ── QUESTION MODAL ── */
+.q-top {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-bottom: 18px;
+}
+.badge {
+  padding: 5px 16px;
+  border-radius: 50px;
+  font-weight: 900;
+  font-size: 0.72rem;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.badge-easy   { background: linear-gradient(135deg, #059669, #10B981); color:white; }
+.badge-medium { background: linear-gradient(135deg, var(--h1), var(--gold)); color:white; }
+.badge-hard   { background: linear-gradient(135deg, #DC2626, #EF4444); color:white; }
+.badge-pts    { background: linear-gradient(135deg, var(--gold), var(--h1)); color: var(--brown); }
+
+.q-text {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--brown);
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.45;
+}
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+
+.option {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 2.5px solid rgba(252,211,77,0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.option:hover:not(.disabled) {
+  transform: translateX(6px) scale(1.01);
+  border-color: var(--h1);
+  background: rgba(255,255,255,0.95);
+  box-shadow: var(--shadow-md);
+}
+.option.correct {
+  background: var(--green-m);
+  border-color: var(--green);
+  animation: correctFlash 0.4s ease;
+}
+@keyframes correctFlash {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+.option.wrong {
+  background: var(--red-m);
+  border-color: var(--red);
+  animation: wrongShake 0.4s ease;
+}
+@keyframes wrongShake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+.option.disabled { cursor: not-allowed; }
+
+.opt-letter {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--h1), var(--h2));
+  color: white;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.15rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  box-shadow: 0 2px 6px rgba(245,158,11,0.3);
+}
+.option.correct .opt-letter { background: linear-gradient(135deg, #059669, #10B981); }
+.option.wrong   .opt-letter { background: linear-gradient(135deg, #DC2626, #EF4444); }
+
+.opt-text { font-size: 0.97rem; color: var(--brown); font-weight: 700; flex: 1; }
+
+.result-area { margin-top: 20px; text-align: center; animation: fadeUp 0.4s ease; }
+
+.result-msg {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.7rem; font-weight: 800;
+  margin-bottom: 6px;
+}
+.combo-msg { font-size: 0.95rem; font-weight: 800; color: var(--h2); margin-bottom: 14px; }
+
+.explanation-box {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--h1);
+  text-align: left;
+  margin-bottom: 18px;
+}
+.explanation-box .label { font-size: 0.8rem; font-weight: 900; color: var(--mid); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+.explanation-box p { font-size: 0.88rem; color: var(--brown); line-height: 1.55; font-weight: 600; }
+
+.btn-continue {
+  background: linear-gradient(145deg, var(--h1), var(--h2));
+  color: white; border: none;
+  padding: 13px 40px;
+  border-radius: 50px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1rem; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--h3), 0 8px 20px rgba(120,53,15,0.2);
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative; overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.btn-continue::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent 60%);
+  border-radius: 50px;
+}
+.btn-continue:hover { transform: translateY(-3px); box-shadow: 0 8px 0 var(--h3), 0 12px 24px rgba(120,53,15,0.25); }
+
+/* ── GAME OVER ── */
+.go-header { text-align: center; margin-bottom: 22px; }
+.go-emoji { font-size: 5rem; display: block; margin-bottom: 10px; animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes bounceIn {
+  from { transform: scale(0) rotate(-20deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+.go-rank { font-family: 'Baloo 2', cursive; font-size: 2rem; font-weight: 800; margin-bottom: 5px; }
+.go-enc { font-size: 0.9rem; font-weight: 700; color: var(--mid); }
+
+.go-score-card {
+  border-radius: var(--radius-md);
+  padding: 22px;
+  text-align: center;
+  border: 3px solid;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-md);
+}
+.go-score-lbl { font-size: 0.78rem; font-weight: 900; color: var(--mid); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.go-score-val { font-family: 'Baloo 2', cursive; font-size: 4rem; font-weight: 900; line-height: 1; }
+
+.go-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+.go-stat {
+  background: rgba(255,255,255,0.7);
+  border-radius: 14px; padding: 13px 8px;
+  text-align: center; border: 2px solid rgba(252,211,77,0.3);
+}
+.go-stat .stat-icon { font-size: 1.4rem; display:block; margin-bottom:3px; }
+.go-stat .stat-val { font-family:'Baloo 2',cursive; font-size:1.4rem; font-weight:800; color:var(--brown); }
+.go-stat .stat-lbl { font-size:0.65rem; font-weight:900; color:var(--mid); text-transform:uppercase; letter-spacing:0.8px; }
+
+.achievements-box {
+  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(254,243,199,0.8));
+  border-radius: 16px; padding: 16px;
+  margin-bottom: 16px;
+  border: 2px solid rgba(252,211,77,0.5);
+}
+.achievements-box h3 { font-family:'Baloo 2',cursive; font-size:1rem; font-weight:700; color:var(--brown); margin-bottom:10px; text-align:center; }
+.ach-item {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.7); border-radius: 10px;
+  padding: 10px 14px; margin-bottom: 8px;
+  border: 2px solid rgba(252,211,77,0.3);
+  transition: transform 0.2s;
+}
+.ach-item:hover { transform: translateX(4px); }
+.ach-item:last-child { margin-bottom: 0; }
+.ach-emoji { font-size: 1.4rem; }
+.ach-text { font-weight: 800; color: var(--brown); font-size: 0.88rem; }
+
+.funfact-box {
+  background: linear-gradient(135deg, rgba(255,249,195,0.9), rgba(254,243,199,0.9));
+  border-radius: 14px; padding: 14px 16px;
+  margin-bottom: 18px;
+  border-left: 4px solid var(--h1);
+}
+.funfact-box .label { font-size: 0.78rem; font-weight: 900; color: var(--mid); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.funfact-box p { font-size: 0.88rem; color: var(--brown); line-height: 1.55; font-weight: 600; }
+
+.btn-restart {
+  width: 100%;
+  background: linear-gradient(145deg, var(--h1), var(--h2));
+  color: white; border: none;
+  padding: 16px; border-radius: 16px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.1rem; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--h3), 0 8px 20px rgba(120,53,15,0.2);
+  transition: transform 0.15s, box-shadow 0.15s;
+  margin-bottom: 12px; position: relative; overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.btn-restart::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent 60%);
+  border-radius: 16px;
+}
+.btn-restart:hover { transform: translateY(-3px); box-shadow: 0 8px 0 var(--h3), 0 12px 24px rgba(120,53,15,0.25); }
+
+.footer-note { text-align:center; font-size:0.78rem; font-weight:700; color:var(--mid); }
+
+/* ── ANIMATIONS ── */
+@keyframes slideDown {
+  from { opacity:0; transform:translateY(-24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+@media (max-width: 420px) {
+  .title { font-size:2.6rem; }
+  .board-grid { gap:3px; }
+  .tile { border-radius:8px; font-size:1rem; }
+  .tile-number { font-size:0.48rem; width:14px; height:14px; }
+  .dice { width:76px; height:76px; font-size:2.4rem; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1 class="title">
+      <span class="bee">🐝</span> ApiTrivia <span class="bee bee2">🍯</span>
+    </h1>
+    <p class="subtitle">El Juego de la Apicultura</p>
+  </div>
+
+  <!-- SCOREBOARD -->
+  <div class="card scoreboard">
+    <div class="stats-grid">
+      <div class="stat">
+        <span class="stat-icon">🏆</span>
+        <div class="stat-val" id="scoreValue">0</div>
+        <div class="stat-lbl">Puntos</div>
+      </div>
+      <div class="stat">
+        <span class="stat-icon">❓</span>
+        <div class="stat-val" id="questionsValue">0</div>
+        <div class="stat-lbl">Preguntas</div>
+      </div>
+      <div class="stat">
+        <span class="stat-icon">📍</span>
+        <div class="stat-val" id="positionValue">1/30</div>
+        <div class="stat-lbl">Casilla</div>
+      </div>
+    </div>
+    <div class="stats-grid" id="extraStats" style="display:none">
+      <div class="stat">
+        <span class="stat-icon">🎯</span>
+        <div class="stat-val" id="accuracyValue">0%</div>
+        <div class="stat-lbl">Precisión</div>
+      </div>
+      <div class="stat stat-combo" id="comboCard" style="display:none">
+        <span class="stat-icon">🔥</span>
+        <div class="stat-val" id="comboValue">x0</div>
+        <div class="stat-lbl">Combo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="card progress-card">
+    <div class="progress-header">
+      <span class="progress-label">🏁 Inicio</span>
+      <span class="progress-pct" id="progressText">1 de 30</span>
+      <span class="progress-label">🎯 Meta</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressBar" style="width:2%">
+        <span class="progress-bee">🐝</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOARD -->
+  <div class="card board-card">
+    <div class="board-header">
+      <div class="board-title">🍯 Tablero Apícola — 30 casillas</div>
+    </div>
+    <div class="board-grid" id="gameBoard"><div class="tile tile-start tile-active" id="tile-0" style="animation-delay: 0s;"><div class="tile-number">1</div><div>🏁</div><div class="bee-player">🐝</div></div><div class="tile tile-question" id="tile-1" style="animation-delay: 0.02s;"><div class="tile-number">2</div><div>❓</div></div><div class="tile tile-question" id="tile-2" style="animation-delay: 0.04s;"><div class="tile-number">3</div><div>❓</div></div><div class="tile tile-question" id="tile-3" style="animation-delay: 0.06s;"><div class="tile-number">4</div><div>❓</div></div><div class="tile tile-bonus" id="tile-4" style="animation-delay: 0.08s;"><div class="tile-number">5</div><div>🍯</div></div><div class="tile tile-bonus" id="tile-9" style="animation-delay: 0.1s;"><div class="tile-number">10</div><div>🌻</div></div><div class="tile tile-question" id="tile-8" style="animation-delay: 0.12s;"><div class="tile-number">9</div><div>❓</div></div><div class="tile tile-multiplier" id="tile-7" style="animation-delay: 0.14s;"><div class="tile-number">8</div><div>⚡</div></div><div class="tile tile-question" id="tile-6" style="animation-delay: 0.16s;"><div class="tile-number">7</div><div>❓</div></div><div class="tile tile-question" id="tile-5" style="animation-delay: 0.18s;"><div class="tile-number">6</div><div>❓</div></div><div class="tile tile-question" id="tile-10" style="animation-delay: 0.2s;"><div class="tile-number">11</div><div>❓</div></div><div class="tile tile-question" id="tile-11" style="animation-delay: 0.22s;"><div class="tile-number">12</div><div>❓</div></div><div class="tile tile-question" id="tile-12" style="animation-delay: 0.24s;"><div class="tile-number">13</div><div>❓</div></div><div class="tile tile-question" id="tile-13" style="animation-delay: 0.26s;"><div class="tile-number">14</div><div>❓</div></div><div class="tile tile-bonus" id="tile-14" style="animation-delay: 0.28s;"><div class="tile-number">15</div><div>🍯</div></div><div class="tile tile-bonus" id="tile-19" style="animation-delay: 0.3s;"><div class="tile-number">20</div><div>🌼</div></div><div class="tile tile-question" id="tile-18" style="animation-delay: 0.32s;"><div class="tile-number">19</div><div>❓</div></div><div class="tile tile-question" id="tile-17" style="animation-delay: 0.34s;"><div class="tile-number">18</div><div>❓</div></div><div class="tile tile-question" id="tile-16" style="animation-delay: 0.36s;"><div class="tile-number">17</div><div>❓</div></div><div class="tile tile-multiplier" id="tile-15" style="animation-delay: 0.38s;"><div class="tile-number">16</div><div>⚡</div></div><div class="tile tile-question" id="tile-20" style="animation-delay: 0.4s;"><div class="tile-number">21</div><div>❓</div></div><div class="tile tile-question" id="tile-21" style="animation-delay: 0.42s;"><div class="tile-number">22</div><div>❓</div></div><div class="tile tile-multiplier" id="tile-22" style="animation-delay: 0.44s;"><div class="tile-number">23</div><div>⚡</div></div><div class="tile tile-question" id="tile-23" style="animation-delay: 0.46s;"><div class="tile-number">24</div><div>❓</div></div><div class="tile tile-bonus" id="tile-24" style="animation-delay: 0.48s;"><div class="tile-number">25</div><div>🍯</div></div><div class="tile tile-finish" id="tile-29" style="animation-delay: 0.5s;"><div class="tile-number">30</div><div>🎯</div></div><div class="tile tile-question" id="tile-28" style="animation-delay: 0.52s;"><div class="tile-number">29</div><div>❓</div></div><div class="tile tile-question" id="tile-27" style="animation-delay: 0.54s;"><div class="tile-number">28</div><div>❓</div></div><div class="tile tile-question" id="tile-26" style="animation-delay: 0.56s;"><div class="tile-number">27</div><div>❓</div></div><div class="tile tile-question" id="tile-25" style="animation-delay: 0.58s;"><div class="tile-number">26</div><div>❓</div></div></div>
+  </div>
+
+  <!-- ADVANCE BUTTON -->
+  <div class="card dice-card">
+    <div class="dice-wrap">
+      <button class="roll-btn" id="advanceBtn" onclick="advanceOneStep()">➡️ Avanzar</button>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div class="card rules-card">
+    <div class="rules-title">📜 Reglas del Juego</div>
+
+    <div class="rule-item"><span class="rule-icon">🎲</span><span><strong>Objetivo:</strong> Llega a la casilla 30 (META) respondiendo preguntas sobre apicultura.</span></div>
+    <div class="rule-item"><span class="rule-icon">🐝</span><span><strong>Turnos:</strong> Haz click en "Avanzar" para moverte una casilla.</span></div>
+    <div class="rule-item"><span class="rule-icon">❓</span><span><strong>Preguntas:</strong> Al caer en casillas blancas, responde correctamente para ganar puntos.</span></div>
+    <div class="rule-item"><span class="rule-icon">🔥</span><span><strong>Combos:</strong> Responde bien seguido para multiplicar tus puntos (+2 pts por nivel de combo).</span></div>
+    <div class="rule-item"><span class="rule-icon">⚡</span><span><strong>Multiplicador x2:</strong> Casillas especiales que duplican los puntos de tu próxima respuesta correcta.</span></div>
+    <div class="rule-item"><span class="rule-icon">🏆</span><span><strong>Puntuación:</strong> Fácil (10 pts), Media (15 pts), Difícil (20 pts) + bonus de combo.</span></div>
+
+    <div class="legend-title">🗺️ Tipos de Casillas</div>
+    <div class="legend-grid">
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#FFFBEB,#FEF9C3)"></div><span>❓ Pregunta</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#FEF9C3,#FDE68A)"></div><span>🍯 Bonus +15</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#DBEAFE,#BFDBFE)"></div><span>⚡ x2 Puntos</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5)"></div><span>🏁 Inicio / Meta</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- COMBO TOAST -->
+<div class="combo-toast" id="comboToast">
+  <div class="combo-toast-label" id="comboLabel">¡EN RACHA! 💫</div>
+  <div class="combo-toast-num" id="comboNumber">x3 COMBO</div>
+  <div class="combo-toast-bonus" id="comboBonus">+6 pts extra</div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"></div>
+
+<!-- QUESTION MODAL -->
+<div class="modal" id="questionModal">
+  <div class="modal-box">
+    <div class="q-top">
+      <span style="font-size:1.8rem">🐝</span>
+      <span class="badge" id="difficultyBadge">Fácil</span>
+      <span class="badge badge-pts" id="pointsBadge">+10 pts</span>
+    </div>
+    <div class="q-text" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="result-area" id="resultContainer" style="display:none">
+      <div class="result-msg" id="resultText"></div>
+      <div class="combo-msg" id="comboKeepText" style="display:none"></div>
+      <div class="explanation-box">
+        <div class="label">📚 Explicación</div>
+        <p id="explanationText"></p>
+      </div>
+      <button class="btn-continue" onclick="continueGame()">Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME OVER MODAL -->
+<div class="modal" id="gameOverModal">
+  <div class="modal-box">
+    <div class="go-header">
+      <span class="go-emoji" id="rankEmoji">🍯</span>
+      <div class="go-rank" id="rankTitle">Aprendiz de Apicultor</div>
+      <div class="go-enc" id="encouragement">¡Sigue aprendiendo! 🌱</div>
+    </div>
+    <div class="go-score-card" id="mainScoreCard" style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7)">
+      <div class="go-score-lbl">Puntuación Final</div>
+      <div class="go-score-val" id="finalScore">0</div>
+    </div>
+    <div class="go-stats">
+      <div class="go-stat"><span class="stat-icon">🎯</span><div class="stat-val" id="finalAccuracy">0%</div><div class="stat-lbl">Precisión</div></div>
+      <div class="go-stat"><span class="stat-icon">🔥</span><div class="stat-val" id="finalMaxCombo">x0</div><div class="stat-lbl">Mejor Combo</div></div>
+      <div class="go-stat"><span class="stat-icon">⭐</span><div class="stat-val" id="finalCorrect">0</div><div class="stat-lbl">Correctas</div></div>
+    </div>
+    <div class="achievements-box" id="achievementsContainer" style="display:none">
+      <h3>🏆 Logros Desbloqueados</h3>
+      <div id="achievementsList"></div>
+    </div>
+    <div class="funfact-box">
+      <div class="label">🐝 Dato Curioso</div>
+      <p id="funFactText"></p>
+    </div>
+    <button class="btn-restart" onclick="restartGame()">🔄 Jugar de Nuevo</button>
+  </div>
+</div>
+
+<script>
+// ── AUDIO ────────────────────────────────────────────────────
+const AC = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(type) {
+  try {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.connect(g); g.connect(AC.destination);
+    const t = AC.currentTime;
+    switch(type) {
+      case 'dice':
+        o.frequency.setValueAtTime(300,t); o.frequency.exponentialRampToValueAtTime(600,t+0.1);
+        g.gain.setValueAtTime(0.3,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.15);
+        o.start(t); o.stop(t+0.15); break;
+      case 'move':
+        o.frequency.setValueAtTime(480,t); o.type='sine';
+        g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.07);
+        o.start(t); o.stop(t+0.07); break;
+      case 'correct':
+        o.frequency.setValueAtTime(523,t); o.frequency.setValueAtTime(659,t+0.1); o.frequency.setValueAtTime(784,t+0.2); o.type='sine';
+        g.gain.setValueAtTime(0.3,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.4);
+        o.start(t); o.stop(t+0.4); break;
+      case 'wrong':
+        o.frequency.setValueAtTime(400,t); o.frequency.exponentialRampToValueAtTime(200,t+0.3); o.type='sawtooth';
+        g.gain.setValueAtTime(0.2,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.3);
+        o.start(t); o.stop(t+0.3); break;
+      case 'bonus':
+        o.frequency.setValueAtTime(800,t); o.frequency.setValueAtTime(1000,t+0.05); o.type='sine';
+        g.gain.setValueAtTime(0.3,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.2);
+        o.start(t); o.stop(t+0.2); break;
+      case 'trap':
+        o.frequency.setValueAtTime(150,t); o.type='sawtooth';
+        g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.25);
+        o.start(t); o.stop(t+0.25); break;
+      case 'combo':
+        [0,0.05,0.1,0.15].forEach((d,i)=>o.frequency.setValueAtTime([523,659,784,1047][i],t+d)); o.type='sine';
+        g.gain.setValueAtTime(0.3,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.3);
+        o.start(t); o.stop(t+0.3); break;
+      case 'gameover':
+        o.frequency.setValueAtTime(523,t); o.frequency.setValueAtTime(392,t+0.15); o.frequency.setValueAtTime(523,t+0.3); o.type='square';
+        g.gain.setValueAtTime(0.3,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.5);
+        o.start(t); o.stop(t+0.5); break;
+    }
+  } catch(e){}
+}
+
+// ── NOTIFICATION ────────────────────────────────────────────
+function showNotif(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2400);
+}
+
+// ── STATE ───────────────────────────────────────────────────
+let gs = {
+  pos:0, score:0, answered:0, correct:0,
+  combo:0, maxCombo:0,
+  rolling:false, over:false,
+  usedIds:[], question:null,
+  multiplierActive: false
+};
+
+// ── QUESTIONS ───────────────────────────────────────────────
+const Q = [
+  // FÁCILES (10 preguntas - 10 pts)
+  {id:1,q:'¿Cuántas alas tiene una abeja?',opts:['2 alas','4 alas','6 alas','8 alas'],ans:1,pts:10,dif:'easy',exp:'Las abejas tienen 4 alas: dos grandes delanteras y dos más pequeñas traseras. Las alas se enganchan entre sí durante el vuelo para mayor eficiencia.'},
+  {id:2,q:'¿Cómo se llama la sustancia que producen las abejas para construir el panal?',opts:['Miel','Propóleo','Cera','Polen'],ans:2,pts:10,dif:'easy',exp:'La cera es secretada por glándulas especiales en el abdomen de las abejas obreras. Necesitan consumir aproximadamente 8 kg de miel para producir 1 kg de cera.'},
+  {id:3,q:'¿Cuál es la función principal de la abeja reina?',opts:['Recolectar néctar','Defender la colmena','Poner huevos','Producir miel'],ans:2,pts:10,dif:'easy',exp:'La abeja reina es la única hembra fértil de la colmena. Puede poner hasta 2,000 huevos al día y vive entre 3 a 5 años.'},
+  {id:4,q:'¿Qué herramienta usa el apicultor para calmar a las abejas?',opts:['Cepillo','Ahumador','Espátula','Centrífuga'],ans:1,pts:10,dif:'easy',exp:'El ahumador produce humo que hace que las abejas consuman miel pensando que hay un incendio, volviéndose más dóciles. También enmascara las feromonas de alarma.'},
+  {id:5,q:'¿Qué color NO pueden ver las abejas?',opts:['Rojo','Azul','Amarillo','Violeta'],ans:0,pts:10,dif:'easy',exp:'Las abejas no pueden ver el color rojo, pero pueden ver luz ultravioleta que los humanos no percibimos. Por eso muchas flores tienen patrones UV.'},
+  {id:6,q:'¿Qué parte de la flor buscan las abejas?',opts:['Pétalos','Néctar y polen','Raíz','Tallo'],ans:1,pts:10,dif:'easy',exp:'Las abejas buscan el néctar (líquido azucarado) y el polen (proteínas) de las flores. El néctar se transforma en miel y el polen alimenta las larvas.'},
+  {id:7,q:'¿Qué sucede con una abeja después de picar a un humano?',opts:['Nada, puede picar varias veces','Muere porque pierde el aguijón','Se debilita pero sobrevive','Pierde las alas'],ans:1,pts:10,dif:'easy',exp:'La abeja muere después de picar a mamíferos porque su aguijón tiene púas que se quedan enganchadas en la piel elástica, arrancando parte de su abdomen.'},
+  {id:8,q:'¿Las abejas duermen?',opts:['Sí','No','Solo la reina','Solo en invierno'],ans:0,pts:10,dif:'easy',exp:'Las abejas sí duermen. Las obreras jóvenes duermen dentro de las celdas, mientras que las mayores duermen cerca de la entrada de la colmena.'},
+  {id:9,q:'¿Cómo se llaman las celdas hexagonales del panal?',opts:['Alvéolos','Nidos','Cámaras','Panales'],ans:0,pts:10,dif:'easy',exp:'Los alvéolos son las celdas hexagonales de cera donde las abejas almacenan miel, polen y crían a las larvas. La forma hexagonal es muy eficiente.'},
+  {id:10,q:'¿Pueden las abejas ver en la oscuridad?',opts:['Sí, perfectamente','No','Solo luz infrarroja','Solo la reina'],ans:1,pts:10,dif:'easy',exp:'Las abejas no pueden ver en la oscuridad. Dentro de la colmena oscura se guían por el tacto, olfato y las feromonas.'},
+
+  // MEDIAS (15 preguntas - 15 pts)
+  {id:11,q:'¿Cuántos ojos tiene una abeja?',opts:['2 ojos','3 ojos','4 ojos','5 ojos'],ans:3,pts:15,dif:'medium',exp:'Las abejas tienen 5 ojos: 2 ojos compuestos grandes para detectar movimiento y colores, y 3 ojos simples (ocelos) en la parte superior para detectar la luz.'},
+  {id:12,q:'¿Cómo comunican las abejas dónde están las flores?',opts:['Con sonidos','Con una danza especial','Con olores','Volando en círculos'],ans:1,pts:15,dif:'medium',exp:'La danza del ocho o "waggle dance" indica dirección y distancia de las flores. El ángulo respecto al sol indica dirección, y la duración del movimiento indica distancia.'},
+  {id:13,q:'¿Cuánto vive una abeja obrera trabajando en verano?',opts:['1 semana','6 semanas','6 meses','1 año'],ans:1,pts:15,dif:'medium',exp:'En verano, las obreras viven solo 6 semanas debido al intenso trabajo de recolección. En invierno pueden vivir hasta 6 meses ya que su actividad es menor.'},
+  {id:14,q:'¿Qué es el propóleo que usan las abejas?',opts:['Miel fermentada','Una resina que protege la colmena','Polen mezclado','Cera líquida'],ans:1,pts:15,dif:'medium',exp:'El propóleo es una resina que las abejas recolectan de los árboles y mezclan con cera. Tiene propiedades antibacterianas y lo usan para sellar y desinfectar la colmena.'},
+  {id:15,q:'¿Cuál es el parásito más peligroso para las abejas?',opts:['Hormigas','Ácaro Varroa','Avispas','Arañas'],ans:1,pts:15,dif:'medium',exp:'La Varroa destructor es un ácaro parásito que se alimenta de las abejas y transmite virus. Es considerada la mayor amenaza para la apicultura mundial.'},
+  {id:16,q:'¿Cuántas abejas viven en una colmena grande?',opts:['5.000','20.000','60.000','100.000'],ans:2,pts:15,dif:'medium',exp:'Una colmena fuerte en temporada alta puede albergar entre 50,000 y 80,000 abejas. En invierno, la población se reduce a unas 10,000-20,000.'},
+  {id:17,q:'¿Qué porcentaje de nuestra comida depende de las abejas?',opts:['10%','30%','50%','70%'],ans:2,pts:15,dif:'medium',exp:'Aproximadamente el 50% de los cultivos que consumimos dependen de la polinización de abejas. Frutas, verduras y frutos secos serían escasos sin ellas.'},
+  {id:18,q:'¿Con qué alimentan los apicultores a las abejas en invierno?',opts:['Agua con azúcar','Jarabe de azúcar','Solo miel','Polen seco'],ans:1,pts:15,dif:'medium',exp:'En invierno, los apicultores suplementan con jarabe de azúcar (agua + azúcar) o fondant (pasta de azúcar) para asegurar que la colonia tenga suficientes reservas.'},
+  {id:19,q:'¿Cuántos zánganos (machos) hay en una colmena?',opts:['Ninguno','Entre 200 y 500','Entre 1000 y 2000','Más de 5000'],ans:1,pts:15,dif:'medium',exp:'Los zánganos (machos) son entre 200 y 500 en temporada alta. Su única función es fecundar a la reina. No recolectan néctar ni polen.'},
+  {id:20,q:'¿Qué obtienen las larvas de abeja del polen?',opts:['Azúcar','Proteínas','Agua','Vitaminas'],ans:1,pts:15,dif:'medium',exp:'El polen es la principal fuente de proteína para las larvas de abeja. Es esencial para su desarrollo y crecimiento.'},
+  {id:21,q:'¿Cuántas veces baten las alas las abejas por segundo?',opts:['50 veces','100 veces','200 veces','400 veces'],ans:2,pts:15,dif:'medium',exp:'Las abejas baten sus alas aproximadamente 200 veces por segundo, lo que produce su característico zumbido y les permite volar a gran velocidad.'},
+  {id:22,q:'¿Cuánta agua tiene la miel cuando está lista?',opts:['5%','Menos del 18%','35%','50%'],ans:1,pts:15,dif:'medium',exp:'La miel madura tiene menos del 18% de agua. Las abejas evaporan el agua del néctar (que tiene 70-80% de agua) batiendo sus alas.'},
+  {id:23,q:'¿Cuánto tarda en nacer una abeja obrera?',opts:['12 días','18 días','21 días','30 días'],ans:2,pts:15,dif:'medium',exp:'Una abeja obrera tarda 21 días en desarrollarse completamente: 3 días como huevo, 6 como larva, y 12 días como pupa.'},
+  {id:24,q:'¿Qué hacen las abejas con animales muertos en la colmena?',opts:['Los sacan','Los cubren con propóleo','Los ignoran','Los descomponen'],ans:1,pts:15,dif:'medium',exp:'Si un intruso grande (como un ratón) muere dentro y no pueden sacarlo, lo momifican cubriéndolo completamente con propóleo antibacteriano.'},
+  {id:25,q:'¿Cuántas flores visita una abeja en cada viaje?',opts:['Entre 10 y 20','Entre 50 y 100','Entre 500 y 1000','Más de 2000'],ans:1,pts:15,dif:'medium',exp:'En un solo viaje de recolección, una abeja puede visitar entre 50 y 100 flores. Realizan múltiples viajes al día.'},
+
+  // DIFÍCILES (5 preguntas - 20 pts)
+  {id:26,q:'¿Cuántas flores debe visitar una abeja para producir 1 kg de miel?',opts:['100.000 flores','500.000 flores','2 millones de flores','4 millones de flores'],ans:3,pts:20,dif:'hard',exp:'Para producir 1 kg de miel, las abejas deben visitar aproximadamente 4 millones de flores y volar una distancia equivalente a dar 4 vueltas a la Tierra.'},
+  {id:27,q:'¿Qué es la jalea real?',opts:['Miel especial','Secreción glandular para la reina','Polen mezclado','Cera refinada'],ans:1,pts:20,dif:'hard',exp:'La jalea real es una secreción de las glándulas hipofaríngeas de las abejas nodrizas. Es el alimento exclusivo de la reina durante toda su vida y lo que la diferencia de las obreras.'},
+  {id:28,q:'¿Qué estructura usan las abejas para almacenar néctar antes de llevarlo a la colmena?',opts:['Intestino medio','Estómago social','Buche melario','Tráquea'],ans:2,pts:20,dif:'hard',exp:'El buche melario es un "estómago de miel" donde la abeja almacena el néctar mientras lo transporta y comienza a transformarlo en miel con sus enzimas.'},
+  {id:29,q:'¿Cuál es la proporción ideal de azúcar a agua para alimentación de emergencia en primavera?',opts:['1:1 (50% azúcar)','1:2 (33% azúcar)','2:1 (67% azúcar)','3:1 (75% azúcar)'],ans:0,pts:20,dif:'hard',exp:'Un jarabe 1:1 (1 kg azúcar por 1 litro agua) es ideal para estimular en primavera, mientras que 2:1 se usa en otoño para reservas de invierno.'},
+  {id:30,q:'¿Qué ocurre si desaparece la reina y no hay larvas jóvenes?',opts:['La colmena muere','Las obreras crean una nueva reina','Aparece una obrera ponedora','Se forma un enjambre'],ans:2,pts:20,dif:'hard',exp:'Si no hay larvas jóvenes para criar una reina, algunas obreras desarrollan sus ovarios y empiezan a poner huevos no fertilizados, que solo producen zánganos. La colmena está condenada sin intervención.'},
+];
+
+// ── TILES ───────────────────────────────────────────────────
+const tiles = [];
+const specials = {
+  0:{type:'start',label:'🏁'}, 29:{type:'finish',label:'🎯'},
+  // Bonus tiles (honey and flowers)
+  4:{type:'bonus',label:'🍯'}, 9:{type:'bonus',label:'🌻'}, 14:{type:'bonus',label:'🍯'},
+  19:{type:'bonus',label:'🌼'}, 24:{type:'bonus',label:'🍯'},
+  // x2 Multiplier tiles
+  7:{type:'multiplier',label:'⚡'}, 15:{type:'multiplier',label:'⚡'}, 22:{type:'multiplier',label:'⚡'},
+};
+
+// ── INIT ────────────────────────────────────────────────────
+function initGame() {
+  for (let i=0;i<30;i++)
+    tiles.push(specials[i] ? {id:i,...specials[i]} : {id:i,type:'question',label:'❓'});
+  renderBoard();
+  updateUI();
+}
+
+// ── RENDER BOARD ────────────────────────────────────────────
+function renderBoard() {
+  const board = document.getElementById('gameBoard');
+  board.innerHTML = '';
+  for (let row=0;row<6;row++) {
+    const row_tiles = tiles.slice(row*5,(row+1)*5);
+    if (row%2===1) row_tiles.reverse();
+    row_tiles.forEach((tile,i) => {
+      const div = document.createElement('div');
+      div.className = `tile tile-${tile.type}`;
+      div.id = `tile-${tile.id}`;
+      div.style.animationDelay = `${(row*5+i)*0.02}s`;
+
+      const num = document.createElement('div');
+      num.className = 'tile-number';
+      num.textContent = tile.id+1;
+      div.appendChild(num);
+
+      const lbl = document.createElement('div');
+      lbl.textContent = tile.label;
+      div.appendChild(lbl);
+
+      if (tile.id === gs.pos) {
+        const bee = document.createElement('div');
+        bee.className = 'bee-player';
+        const bees = ['🐝','🐝','🐝','🐝','🐝','🐝'];
+        bee.textContent = bees[tile.id % bees.length];
+        div.appendChild(bee);
+        div.classList.add('tile-active');
+      }
+      board.appendChild(div);
+    });
+  }
+}
+
+// ── UPDATE UI ───────────────────────────────────────────────
+function updateUI() {
+  document.getElementById('scoreValue').textContent = gs.score;
+  document.getElementById('questionsValue').textContent = gs.answered;
+  document.getElementById('positionValue').textContent = `${gs.pos+1}/30`;
+
+  const pct = Math.max(2, Math.round((gs.pos/29)*100));
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressText').textContent = `${gs.pos+1} de 30`;
+
+  if (gs.answered > 0) {
+    document.getElementById('extraStats').style.display = 'grid';
+    document.getElementById('accuracyValue').textContent =
+      Math.round((gs.correct/gs.answered)*100)+'%';
+  }
+  if (gs.combo > 0) {
+    document.getElementById('comboCard').style.display = 'block';
+    document.getElementById('comboValue').textContent = `x${gs.combo}`;
+    if (gs.combo >= 3) showComboToast();
+  } else {
+    document.getElementById('comboCard').style.display = 'none';
+    hideComboToast();
+  }
+}
+
+function showComboToast() {
+  const lbl = gs.combo>=10?'¡LEGENDARIO! 🌟':gs.combo>=7?'¡INCREÍBLE! 🔥':gs.combo>=5?'¡EXCELENTE! ⚡':'¡EN RACHA! 💫';
+  document.getElementById('comboLabel').textContent = lbl;
+  document.getElementById('comboNumber').textContent = `x${gs.combo} COMBO`;
+  document.getElementById('comboBonus').textContent = `+${gs.combo*2} pts extra`;
+  document.getElementById('comboToast').classList.add('show');
+}
+function hideComboToast() { document.getElementById('comboToast').classList.remove('show'); }
+
+// ── ADVANCE ONE STEP ────────────────────────────────────────
+function advanceOneStep() {
+  if (gs.rolling || gs.over || gs.pos >= 29) return;
+  gs.rolling = true;
+  const btn = document.getElementById('advanceBtn');
+  btn.disabled = true;
+  
+  // Initialize audio context on user interaction (iOS fix)
+  if (AC.state === 'suspended') {
+    AC.resume();
+  }
+  
+  playSound('move');
+  
+  setTimeout(()=>{
+    movePlayer(1);
+    gs.rolling = false;
+    btn.disabled = false;
+  }, 100);
+}
+
+// ── MOVE ────────────────────────────────────────────────────
+function movePlayer(steps) {
+  const from = gs.pos;
+  gs.pos = Math.min(from+steps, 29);
+  
+  // Direct move for single step
+  renderBoard();
+  updateUI();
+  setTimeout(()=>handleTile(tiles[gs.pos]), 300);
+}
+
+function animateBee(from, to, cb) {
+  if (from===to) { renderBoard(); cb&&cb(); return; }
+  let pos = from;
+  const iv = setInterval(()=>{
+    pos++;
+    playSound('move');
+    document.querySelectorAll('.bee-player').forEach(b=>b.remove());
+    document.querySelectorAll('.tile').forEach(t=>t.classList.remove('tile-active'));
+    const el = document.getElementById(`tile-${pos}`);
+    if (el) {
+      const bee = document.createElement('div');
+      bee.className = 'bee-player';
+      const bees = ['🐝','🐝','🐝','🐝','🐝','🐝'];
+      bee.textContent = bees[pos % bees.length];
+      el.appendChild(bee);
+      el.classList.add('tile-active');
+      el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    if (pos>=to) { clearInterval(iv); cb&&cb(); }
+  }, 270);
+}
+
+// ── TILE ACTIONS ────────────────────────────────────────────
+function handleTile(tile) {
+  switch(tile.type) {
+    case 'question': showQuestion(); break;
+    case 'bonus':
+      playSound('bonus');
+      gs.score += 15;
+      showNotif('🍯 ¡Bonus! +15 puntos');
+      updateUI(); break;
+    case 'multiplier':
+      playSound('bonus');
+      gs.multiplierActive = true;
+      showNotif('⚡ ¡x2 activado! Próxima respuesta vale doble');
+      updateUI(); break;
+    case 'finish':
+      gs.over = true;
+      setTimeout(()=>{ playSound('gameover'); showGameOver(); }, 600);
+      break;
+  }
+}
+
+// ── QUESTION ────────────────────────────────────────────────
+function showQuestion() {
+  const avail = Q.filter(q=>!gs.usedIds.includes(q.id));
+  if (!avail.length) { gs.over=true; showGameOver(); return; }
+
+  gs.question = avail[Math.floor(Math.random()*avail.length)];
+  gs.usedIds.push(gs.question.id);
+
+  const q = gs.question;
+  document.getElementById('questionText').textContent = q.q;
+
+  const badge = document.getElementById('difficultyBadge');
+  badge.className = `badge badge-${q.dif}`;
+  badge.textContent = q.dif==='easy'?'Fácil':q.dif==='medium'?'Media':'Difícil';
+  document.getElementById('pointsBadge').textContent = `+${q.pts + gs.combo*2} pts`;
+
+  const c = document.getElementById('optionsContainer');
+  c.innerHTML = '';
+  q.opts.forEach((opt,i)=>{
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.id = `opt-${i}`;
+    div.innerHTML = `<div class="opt-letter">${String.fromCharCode(65+i)}</div><div class="opt-text">${opt}</div>`;
+    div.onclick = ()=>pick(i);
+    div.ontouchstart = (e)=>{ e.preventDefault(); pick(i); };
+    c.appendChild(div);
+  });
+
+  document.getElementById('questionModal').classList.add('show');
+  document.getElementById('resultContainer').style.display = 'none';
+}
+
+function pick(idx) {
+  document.querySelectorAll('.option').forEach(o=>{ o.classList.add('disabled'); o.onclick=null; o.ontouchstart=null; });
+  document.getElementById(`opt-${idx}`).classList.add('selected');
+  setTimeout(()=>grade(idx), 380);
+}
+
+function grade(idx) {
+  const correct = idx === gs.question.ans;
+  document.querySelectorAll('.option')[gs.question.ans].classList.add('correct');
+  if (!correct) document.getElementById(`opt-${idx}`).classList.add('wrong');
+
+  playSound(correct ? (gs.combo>=2?'combo':'correct') : 'wrong');
+  gs.answered++;
+
+  if (correct) {
+    let pts = gs.question.pts + gs.combo*2;
+    
+    // Apply multiplier if active
+    if (gs.multiplierActive) {
+      pts = pts * 2;
+      showNotif('⚡ ¡x2 aplicado! Puntos duplicados');
+      gs.multiplierActive = false;
+    }
+    
+    gs.score += pts;
+    gs.correct++;
+    gs.combo++;
+    if (gs.combo > gs.maxCombo) gs.maxCombo = gs.combo;
+    document.getElementById('resultText').textContent = '¡Correcto! 🎉';
+    document.getElementById('resultText').style.color = '#059669';
+    if (gs.combo > 1) {
+      document.getElementById('comboKeepText').style.display = 'block';
+      document.getElementById('comboKeepText').textContent = `🔥 ¡Combo continúa! x${gs.combo}`;
+    } else {
+      document.getElementById('comboKeepText').style.display = 'none';
+    }
+  } else {
+    gs.combo = 0;
+    gs.multiplierActive = false; // Lost multiplier on wrong answer
+    document.getElementById('resultText').textContent = '¡Incorrecto! 😢';
+    document.getElementById('resultText').style.color = '#DC2626';
+    document.getElementById('comboKeepText').style.display = 'none';
+  }
+
+  document.getElementById('explanationText').textContent = gs.question.exp;
+  document.getElementById('resultContainer').style.display = 'block';
+  updateUI();
+}
+
+function continueGame() {
+  document.getElementById('questionModal').classList.remove('show');
+  if (gs.pos >= 29) { gs.over=true; setTimeout(()=>showGameOver(), 400); }
+}
+
+// ── GAME OVER ───────────────────────────────────────────────
+function showGameOver() {
+  const acc = gs.answered>0 ? Math.round((gs.correct/gs.answered)*100) : 0;
+  const ranks = [
+    {min:300,emoji:'👑',title:'Maestro Apicultor',color:'#EAB308'},
+    {min:200,emoji:'🌟',title:'Experto en Abejas',color:'#9C27B0'},
+    {min:150,emoji:'⚡',title:'Apicultor Avanzado',color:'#F59E0B'},
+    {min:100,emoji:'🐝',title:'Apicultor Competente',color:'#059669'},
+    {min:0,  emoji:'🍯',title:'Aprendiz de Apicultor',color:'#D97706'},
+  ];
+  const rank = ranks.find(r=>gs.score>=r.min);
+
+  document.getElementById('rankEmoji').textContent = rank.emoji;
+  document.getElementById('rankTitle').textContent  = rank.title;
+  document.getElementById('rankTitle').style.color  = rank.color;
+  document.getElementById('mainScoreCard').style.borderColor = rank.color;
+  document.getElementById('finalScore').textContent = gs.score;
+  document.getElementById('finalScore').style.color = rank.color;
+
+  const msgs = [[90,'¡Conocimiento apícola de élite! 🎓'],[60,'¡Buen intento! Puedes mejorar 📚'],[0,'¡Sigue aprendiendo sobre apicultura! 🌱']];
+  document.getElementById('encouragement').textContent = msgs.find(([t])=>acc>=t)[1];
+  document.getElementById('finalAccuracy').textContent = `${acc}%`;
+  document.getElementById('finalMaxCombo').textContent = `x${gs.maxCombo}`;
+  document.getElementById('finalCorrect').textContent  = gs.correct;
+
+  const achs = [];
+  if (gs.maxCombo>=10) achs.push({e:'🔥',t:'Racha Legendaria x10'});
+  if (gs.maxCombo>=5)  achs.push({e:'⚡',t:'Racha Impresionante x5'});
+  if (acc===100)       achs.push({e:'🎯',t:'Precisión Perfecta'});
+  if (gs.correct>=15)  achs.push({e:'📚',t:'Erudito de Abejas'});
+  if (gs.score>=300)   achs.push({e:'👑',t:'Puntuación Máxima'});
+
+  const ac = document.getElementById('achievementsContainer');
+  if (achs.length) {
+    ac.style.display='block';
+    document.getElementById('achievementsList').innerHTML =
+      achs.map(a=>`<div class="ach-item"><span class="ach-emoji">${a.e}</span><span class="ach-text">${a.t}</span></div>`).join('');
+  } else ac.style.display='none';
+
+  const facts = [
+    'Una abeja reina puede poner hasta 2,000 huevos al día, más que su propio peso corporal.',
+    'Las abejas llevan produciendo miel durante más de 150 millones de años.',
+    'Para 500 g de miel, las abejas visitan 2 millones de flores y vuelan 88,500 km.',
+    'Las abejas pueden reconocer rostros humanos igual que nosotros.',
+    'El zumbido de una abeja son sus alas batiendo 11,400 veces por minuto.',
+    'Una colonia de abejas puede producir hasta 45 kg de miel en un año.',
+    'Se ha encontrado miel comestible de 3,000 años en tumbas egipcias gracias al propóleo.',
+  ];
+  document.getElementById('funFactText').textContent = facts[Math.floor(Math.random()*facts.length)];
+  document.getElementById('gameOverModal').classList.add('show');
+}
+
+// ── RESTART ─────────────────────────────────────────────────
+function restartGame() {
+  gs = {pos:0,score:0,answered:0,correct:0,combo:0,maxCombo:0,rolling:false,over:false,usedIds:[],question:null,multiplierActive:false};
+  document.getElementById('gameOverModal').classList.remove('show');
+  document.getElementById('questionModal').classList.remove('show');
+  document.getElementById('extraStats').style.display = 'none';
+  document.getElementById('progressBar').style.width = '2%';
+  tiles.length = 0;
+  initGame();
+}
+
+initGame();
+</script>
+
+
+</body></html>
